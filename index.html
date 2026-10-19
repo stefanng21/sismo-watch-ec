@@ -1,1 +1,86 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#081320"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Sismo Watch EC"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon.png"><title>Sismo Watch EC</title><link rel="stylesheet" href="style.css"></head><body><header><div class="brand"><span class="pulse">◉</span><div><strong>SISMO WATCH <em>EC</em></strong><small>OBSERVATORIO SÍSMICO · ECUADOR</small></div></div><span id="status" class="status">Cargando…</span></header><main><section class="hero"><span class="eyebrow">MONITOREO DE EVENTOS REPORTADOS</span><h1>Actividad sísmica <span>de Ecuador</span></h1><p>Datos instrumentales publicados por USGS. No es un sistema de alerta temprana.</p><div class="stats"><div><small>EVENTOS FILTRADOS</small><b id="count">—</b></div><div><small>MAGNITUD MÁX.</small><b id="max">—</b></div><div><small>ÚLTIMA CONSULTA</small><b id="updated">—</b></div></div></section><section class="controls"><label>Zona<select id="zone"><option value="ecuador">Ecuador y alrededores</option><option value="imbabura">Imbabura (150 km de Cotacachi)</option><option value="cotacachi">Cotacachi (50 km)</option></select></label><label>Período<select id="period"><option value="day">Últimas 24 horas</option><option value="week" selected>Últimos 7 días</option><option value="month">Últimos 30 días</option></select></label><label>Magnitud mínima<select id="minmag"><option value="0">Todas</option><option value="2">M 2+</option><option value="3" selected>M 3+</option><option value="4">M 4+</option><option value="5">M 5+</option></select></label><button id="refresh">↻ Actualizar</button></section><section class="panel"><div class="panelhead"><h2>Mapa de epicentros</h2><span>● Eventos publicados</span></div><div id="map"><div id="markers"></div><div class="maplabel">ECUADOR · MAPA ESQUEMÁTICO</div></div><p class="note">Mapa esquemático, no cartografía de navegación. Selecciona un evento para abrir su ubicación exacta en mapas.</p></section><section class="panel"><div class="panelhead"><h2>Eventos recientes</h2><span id="resultCount">—</span></div><div id="events" class="events"><p>Consultando catálogo…</p></div></section><section class="panel lab"><div class="panelhead"><h2>Laboratorio de ondas P</h2><span class="tag">PRÓXIMA FASE</span></div><p>La detección experimental requerirá señales continuas de estaciones reales, medición de latencia y confirmación entre varias estaciones. Esta versión no detecta ondas P ni envía avisos anticipados.</p></section><footer>Fuente: USGS Earthquake Hazards Program · Actualización al abrir y cada 60 s mientras la página está activa · Los catálogos pueden tener retrasos y omisiones.</footer></main><script src="app.js"></script></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#081320">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Sismo Watch EC">
+  <meta name="description" content="Monitor de terremotos registrados para Ecuador, Imbabura y el mundo. No es un sistema de alerta temprana.">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./icon.png">
+  <link rel="icon" href="./icon.png">
+  <link rel="preconnect" href="https://tile.openstreetmap.org">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <link rel="stylesheet" href="./style.css?v=2">
+  <title>Sismo Watch EC — Monitor sísmico</title>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-icon" aria-hidden="true">◎</span>
+      <div><strong>SISMO WATCH <em>EC</em></strong><small>MONITOREO SÍSMICO · ECUADOR Y EL MUNDO</small></div>
+    </div>
+    <div class="top-right"><span class="version">V 0.2</span><span id="status" class="status" role="status" aria-live="polite">Cargando…</span></div>
+  </header>
+  <main>
+    <section class="hero">
+      <div class="hero-heading"><span class="eyebrow">OBSERVATORIO · EVENTOS REPORTADOS</span><span class="pill">INFORMATIVO · NO ALERTA TEMPRANA</span></div>
+      <h1>La Tierra en movimiento<span>.</span></h1>
+      <p>Explora terremotos publicados por USGS, desde Imbabura hasta cualquier lugar del planeta. No predice terremotos ni detecta ondas P.</p>
+      <div class="stats">
+        <div><small>EVENTOS EN EL FILTRO</small><b id="count">—</b></div>
+        <div><small>MAGNITUD MÁXIMA</small><b id="max">—</b></div>
+        <div><small>ÚLTIMA CONSULTA</small><b id="updated">—</b></div>
+      </div>
+    </section>
+
+    <section class="controls panel" aria-label="Filtros de monitoreo">
+      <div class="controls-title"><h2>Configura tu monitoreo</h2><span>Datos publicados, no detección en directo</span></div>
+      <div class="filter-grid">
+        <label>Zona<select id="zone">
+          <option value="ecuador" selected>Ecuador y alrededores</option>
+          <option value="imbabura">Imbabura · Cotacachi</option>
+          <option value="cotacachi">Cotacachi</option>
+          <option value="world">Todo el mundo</option>
+          <option value="nearby">Cerca de mi ubicación</option>
+          <option value="custom">Elegir punto en el mapa</option>
+        </select></label>
+        <label>Período<select id="period"><option value="day">Últimas 24 horas</option><option value="week" selected>Últimos 7 días</option><option value="month">Últimos 30 días</option></select></label>
+        <label>Magnitud mínima<select id="minmag"><option value="0">Todas las publicadas</option><option value="2">M 2+</option><option value="3" selected>M 3+</option><option value="4">M 4+</option><option value="5">M 5+</option></select></label>
+        <label>Radio de consulta<select id="radius"><option value="25">25 km</option><option value="50" selected>50 km</option><option value="100">100 km</option><option value="150">150 km</option><option value="250">250 km</option><option value="500">500 km</option><option value="1000">1000 km</option></select></label>
+      </div>
+      <div class="actions">
+        <button type="button" id="locate" class="btn primary">⌖ Usar mi ubicación</button>
+        <button type="button" id="pick" class="btn secondary">⊕ Elegir en el mapa</button>
+        <button type="button" id="refresh" class="btn secondary">↻ Actualizar datos</button>
+      </div>
+      <p class="helper" id="zoneHint">El radio aplica a zonas centradas en un punto. Selecciona «Cerca de mi ubicación» para pedir permiso de localización.</p>
+      <p class="notice">El radio solo limita la búsqueda: <strong>no representa un área segura ni un cálculo de riesgo.</strong> La ubicación se solicita únicamente al pulsar el botón y no se guarda ni se envía a nuestro servidor.</p>
+    </section>
+
+    <section class="panel map-panel">
+      <div class="panelhead"><div><h2>Mapa de epicentros</h2><p id="mapSubtitle">Ecuador y alrededores · eventos publicados</p></div><div class="legend"><span></span> Evento registrado</div></div>
+      <div class="map-wrap"><div id="map" role="application" aria-label="Mapa geográfico interactivo de terremotos"></div><div id="map-fallback" hidden>No fue posible cargar el mapa. Comprueba tu conexión e intenta actualizar la página.</div><div id="map-message" class="map-message" hidden></div></div>
+      <div class="map-footer"><span id="mapCount">—</span><span>Cartografía © OpenStreetMap · Mueve y amplía el mapa</span></div>
+    </section>
+
+    <section class="panel">
+      <div class="panelhead"><div><h2>Eventos recientes</h2><p>Ordenados del más reciente al más antiguo</p></div><span id="resultCount" class="counter">—</span></div>
+      <div id="events" class="events" aria-live="polite"><p class="empty">Consultando registros…</p></div>
+      <p class="helper" id="listNote"></p>
+    </section>
+
+    <section class="panel laboratory">
+      <div class="panelhead"><h2>Laboratorio de ondas P</h2><span class="tag">EN DESARROLLO</span></div>
+      <p>Próxima fase: evaluar la disponibilidad y la latencia de estaciones sísmicas y analizar señales instrumentales. Esta versión <strong>no analiza ondas P, no emite alarmas ni avisos anticipados</strong>.</p>
+    </section>
+    <footer>
+      Fuente: <a href="https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php" target="_blank" rel="noopener noreferrer">USGS Earthquake Hazards Program</a> · Consulta al abrir y cada ~60 s mientras la página está visible. La publicación de cada evento puede retrasarse y el catálogo no es completo para todos los sismos pequeños. <strong>Ante un sismo, sigue las indicaciones de las autoridades y los sistemas oficiales.</strong>
+    </footer>
+  </main>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="./app.js?v=2" defer></script>
+</body>
+</html>
